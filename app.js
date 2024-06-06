@@ -4,7 +4,19 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 const host = '127.0.0.1';
+
+// ** App.use introduces middlewares which sit between each and every request and helps to process them or modify them as well
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Hello from the middleware: ', req.body);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 const getAllTours = () => {
   return (req, res) => {
@@ -18,6 +30,7 @@ const getAllTours = () => {
 
 const getTourById = () => {
   return (req, res) => {
+    console.log(req.requestTime);
     const id = req.params.id * 1;
     if (id > tours.length) {
       return res.status(404).json({
