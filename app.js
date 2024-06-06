@@ -6,77 +6,106 @@ const port = 3000;
 const host = '127.0.0.1';
 app.use(express.json());
 
-// ** Send method only sends text
-// app.get('/', (req, res) => {
-//   res.status(200).send('First API call with Express JS');
-// });
+const getAllTours = () => {
+  return (req, res) => {
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: { tours },
+    });
+  };
+};
 
-// ** JSON method allows sending JSON to client
-// app.get('/', (req, res) => {
-//   res.status(200).json({
-//     message: 'First API call with Express JS',
-//     appName: 'Natours API',
-//   });
-// });
+const getTourById = () => {
+  return (req, res) => {
+    const id = req.params.id * 1;
+    if (id > tours.length) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Invalid ID',
+      });
+    }
 
-// app.post('/', (req, res) => {
-//   res.status(200).send('You can send data on this API');
-// });
+    const tour = tours.find((el) => el.id === id);
+
+    res.status(200).json({
+      status: 'success',
+      data: { tour },
+    });
+  };
+};
+
+const addNewTour = () => {
+  return (req, res) => {
+    const id = tours[tours.length - 1].id + 1;
+    const newTour = Object.assign({ id }, req.body);
+    tours.push(newTour);
+    fs.writeFile(
+      `${__dirname}/dev-data/data/tours-simple.json`,
+      JSON.stringify(tours),
+      (err) => {
+        res.status(201).json({
+          status: 'Write successful',
+          data: {
+            tours: newTour,
+          },
+        });
+      }
+    );
+  };
+};
+
+const updateTour = () => {
+  return (req, res) => {
+    if (req.params.id > tours.length) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Invalid ID',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour: 'Updated tour',
+      },
+    });
+  };
+};
+
+const deleteTour = () => {
+  return (req, res) => {
+    if (req.params.id > tours.length) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Invalid ID',
+      });
+    }
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  };
+};
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-// For normal api route
-app.get('/api/v1/tours', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: { tours },
-  });
-});
+// app.get('/api/v1/tours', getAllTours());
+// app.post('/api/v1/tours', addNewTour());
+// app.get('/api/v1/tours/:id', getTourById());
+// app.patch('/api/v1/tours/:id', updateTour());
+// app.delete('/api/v1/tours/:id', deleteTour());
 
-// For dynamic API route
-app.get('/api/v1/tours/:id', (req, res) => {
-  // ** Gives us dynamic parameters of the requested path
-  // console.log(req.params);
-  const id = req.params.id * 1;
-  // check if the id exists, if it doesn't send an error response
-  if (id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
+app.route('/api/v1/tours').get(getAllTours()).post(addNewTour());
 
-  const tour = tours.find((el) => el.id === id);
-
-  // ** If the id exists, send the response
-  res.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-});
-
-app.post('/api/v1/tours', (req, res) => {
-  // console.log(req.body);
-  const id = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id }, req.body);
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'Write successful',
-        data: {
-          tours: newTour,
-        },
-      });
-    }
-  );
-  // res.end('Done');
-});
+app
+  .route('/api/v1/tours/:id')
+  .patch(updateTour())
+  .delete(deleteTour())
+  .get(getTourById());
 
 app.listen(port, host, () => {
   console.log('App running on this port');
