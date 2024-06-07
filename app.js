@@ -160,21 +160,22 @@ const tours = JSON.parse(
 // app.delete('/api/v1/tours/:id', deleteTour());
 
 // ** Routes
-app.route('/api/v1/tours').get(getAllTours()).post(addNewTour());
 
-app
-  .route('/api/v1/tours/:id')
-  .patch(updateTour())
-  .delete(deleteTour())
-  .get(getTourById());
+const tourRouter = express.Router();
+const userRouter = express.Router();
 
-app.route('/api/v1/users').get(getAllUsers()).post(createUser());
+tourRouter.route('/').get(getAllTours()).post(addNewTour);
+tourRouter.route('/:id').patch(updateTour).delete(deleteTour).get(getTourById);
 
-app
-  .route('/api/v1/users/:id')
+userRouter.route('/').get(getAllUsers()).post(createUser());
+userRouter
+  .route('/:id')
   .get(getUserById())
   .patch(updateUser())
   .delete(deleteUser());
+
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 // ** Server Start **//
 app.listen(port, host, () => {
