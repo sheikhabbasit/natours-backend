@@ -1,23 +1,29 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 const port = 3000;
 const host = '127.0.0.1';
 
 // ** App.use introduces middlewares which sit between each and every request and helps to process them or modify them as well
+
+// ** Middlewares
+// app.use(morgan('dev'));
+
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log('Hello from the middleware: ', req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('Hello from the middleware: ', req.body);
+//   next();
+// });
 
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
-});
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   next();
+// });
 
+// ** Route Handlers
 const getAllTours = () => {
   return (req, res) => {
     res.status(200).json({
@@ -102,6 +108,47 @@ const deleteTour = () => {
   };
 };
 
+const getAllUsers = () => {
+  return (req, res) => {
+    res.status(500).json({
+      status: 'error',
+      message: 'This route is not yet defined',
+    });
+  };
+};
+const createUser = () => {
+  return (req, res) => {
+    res.status(500).json({
+      status: 'error',
+      message: 'This route is not yet defined',
+    });
+  };
+};
+const getUserById = () => {
+  return (req, res) => {
+    res.status(500).json({
+      status: 'error',
+      message: 'This route is not yet defined',
+    });
+  };
+};
+const updateUser = () => {
+  return (req, res) => {
+    res.status(500).json({
+      status: 'error',
+      message: 'This route is not yet defined',
+    });
+  };
+};
+const deleteUser = () => {
+  return (req, res) => {
+    res.status(500).json({
+      status: 'error',
+      message: 'This route is not yet defined',
+    });
+  };
+};
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
@@ -112,6 +159,7 @@ const tours = JSON.parse(
 // app.patch('/api/v1/tours/:id', updateTour());
 // app.delete('/api/v1/tours/:id', deleteTour());
 
+// ** Routes
 app.route('/api/v1/tours').get(getAllTours()).post(addNewTour());
 
 app
@@ -120,6 +168,15 @@ app
   .delete(deleteTour())
   .get(getTourById());
 
+app.route('/api/v1/users').get(getAllUsers()).post(createUser());
+
+app
+  .route('/api/v1/users/:id')
+  .get(getUserById())
+  .patch(updateUser())
+  .delete(deleteUser());
+
+// ** Server Start **//
 app.listen(port, host, () => {
   console.log('App running on this port');
 });
