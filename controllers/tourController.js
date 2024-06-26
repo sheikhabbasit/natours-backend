@@ -1,4 +1,5 @@
 const fs = require('fs');
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
@@ -8,17 +9,17 @@ const checkID = (req, res, next, val) => {
   if (id > tours.length) {
     return res.status(404).json({
       status: 'fail',
-      message: 'Invalid ID',
+      message: 'Invalid ID'
     });
   }
   next();
 };
 
 const checkBody = (req, res, next) => {
-  if (!req?.body?.name) {
+  if (!req.body.name) {
     return res.status(404).json({
       status: 'fail',
-      message: 'Invalid ID',
+      message: 'Invalid ID'
     });
   }
   next();
@@ -29,21 +30,20 @@ const getAllTours = () => {
     res.status(200).json({
       status: 'success',
       results: tours.length,
-      data: { tours },
+      data: { tours }
     });
   };
 };
 
 const getTourById = () => {
   return (req, res) => {
-    console.log(req.requestTime);
     const id = req.params.id * 1;
 
-    const tour = tours.find((el) => el.id === id);
+    const tour = tours.find(el => el.id === id);
 
     res.status(200).json({
       status: 'success',
-      data: { tour },
+      data: { tour }
     });
   };
 };
@@ -56,12 +56,12 @@ const addNewTour = () => {
     fs.writeFile(
       `${__dirname}/dev-data/data/tours-simple.json`,
       JSON.stringify(tours),
-      (err) => {
+      () => {
         res.status(201).json({
           status: 'Write successful',
           data: {
-            tours: newTour,
-          },
+            tours: newTour
+          }
         });
       }
     );
@@ -73,8 +73,8 @@ const updateTour = () => {
     res.status(200).json({
       status: 'success',
       data: {
-        tour: 'Updated tour',
-      },
+        tour: 'Updated tour'
+      }
     });
   };
 };
@@ -83,7 +83,7 @@ const deleteTour = () => {
   return (req, res) => {
     res.status(204).json({
       status: 'success',
-      data: null,
+      data: null
     });
   };
 };
@@ -95,5 +95,5 @@ module.exports = {
   updateTour,
   deleteTour,
   checkID,
-  checkBody,
+  checkBody
 };
