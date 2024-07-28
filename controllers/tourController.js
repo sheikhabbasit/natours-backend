@@ -42,7 +42,16 @@ const getAllTours = () => {
         match => `$${match}`
       );
 
-      const query = Tour.find(JSON.parse(queryStrCopy));
+      let query = Tour.find(JSON.parse(queryStrCopy));
+      console.log('q', query);
+
+      // ** 3. Sorting
+      if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        query = query.sort(sortBy);
+      } else {
+        query = query.sort('-createdAt');
+      }
 
       // ** Filtering in one way
       const tours = await query;
