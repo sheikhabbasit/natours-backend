@@ -29,7 +29,21 @@ const Tour = require('../models/tourModel');
 const getAllTours = () => {
   return async (req, res) => {
     try {
-      const tours = await Tour.find();
+      const queryObj = { ...req.query };
+      const excludedFields = ['page', 'sort', 'limit', 'fields'];
+      excludedFields.forEach(el => delete queryObj[el]);
+
+      const query = Tour.find(queryObj);
+
+      // ** Filtering in one way
+      const tours = await query;
+
+      // ** Filtering in another way
+      // const tours = await Tour.find()
+      //   .where('duration')
+      //   .equals(req.query.duration)
+      //   .where('difficulty')
+      //   .equals(req.query.difficulty);
 
       res.status(200).json({
         status: 'success',
@@ -79,7 +93,7 @@ const addNewTour = () => {
     } catch (e) {
       res.status(400).json({
         status: 'Saving failed',
-        message: 'Trying to save invalid data or duplicate data'
+        message: e || 'Trying to save invalid data or duplicate data'
       });
     }
   };
