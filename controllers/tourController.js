@@ -53,6 +53,14 @@ const getAllTours = () => {
         query = query.sort('-createdAt');
       }
 
+      // ** 4. Field limiting
+      if (req.query.fields) {
+        const fields = req.query.fields.split(',').join(' ');
+        query = query.select(fields);
+      } else {
+        query = query.select('-__v');
+      }
+
       // ** Filtering in one way
       const tours = await query;
 
